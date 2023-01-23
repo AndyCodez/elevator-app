@@ -3,6 +3,7 @@ package org.example;
 import java.util.concurrent.TimeUnit;
 
 public class Elevator {
+    private Building building;
     private char elevatorLetter;
     private int currentFloor;
     private String state; // "idle" or "moving"
@@ -10,7 +11,8 @@ public class Elevator {
     private String doors; // "open" or "closed"
     private int destinationFloor;
 
-    public Elevator(char elevatorLetter, int currentFloor, int destinationFloor) {
+    public Elevator(Building building, char elevatorLetter, int currentFloor, int destinationFloor) {
+        this.building = building;
         this.elevatorLetter = elevatorLetter;
         this.currentFloor = currentFloor;
         this.state = "idle";
@@ -60,6 +62,9 @@ public class Elevator {
     }
 
     public void callElevator(int destinationFloor, int secondsPerFloor) throws InterruptedException {
+        if (currentFloor > this.building.getNumberOfFloors() || destinationFloor > this.building.getNumberOfFloors()) {
+            throw new RuntimeException("Floor number is invalid.");
+        }
         System.out.println("Elevator " + this.elevatorLetter + " moving from current Floor " + this.currentFloor + " at " + secondsPerFloor + " secondsPerFloor");
         ElevatorStatus status = this.getStatus();
 
@@ -89,6 +94,17 @@ public class Elevator {
                 this.direction = "up";
                 TimeUnit.SECONDS.sleep(secondsPerFloor);
                 this.currentFloor += 1;
+
+                status.setCurrentFloor(this.currentFloor);
+
+                if (this.currentFloor == destinationFloor) {
+                    this.state = "idle";
+                    this.direction = "";
+                }
+                status.setDirection(this.direction);
+                status.setState(this.state);
+
+                System.out.println("Elevator " + this.elevatorLetter + " is at floor " + status.getCurrentFloor() + " and is " + status.getState() + " " + status.getDirection());
             }
         }
 
