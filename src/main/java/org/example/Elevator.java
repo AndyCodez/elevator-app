@@ -1,6 +1,5 @@
 package org.example;
 
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class Elevator {
@@ -10,11 +9,12 @@ public class Elevator {
     private String doors; // "open" or "closed"
     private int destinationFloor;
 
-    public Elevator(int currentFloor) {
+    public Elevator(int currentFloor, int destinationFloor) {
         this.currentFloor = currentFloor;
         this.state = "idle";
         this.direction = "";
         this.doors = "closed";
+        this.destinationFloor = destinationFloor;
     }
 
     public int getCurrentFloor() {
@@ -58,6 +58,8 @@ public class Elevator {
     }
 
     public void callElevator(int destinationFloor, int secondsPerFloor) throws InterruptedException {
+        System.out.println("From current Floor " + this.currentFloor + " at " + secondsPerFloor + " secondsPerFloor");
+
         closeDoors();
         this.destinationFloor = destinationFloor;
         this.state = "moving";
@@ -68,6 +70,8 @@ public class Elevator {
                 this.direction = "down";
                 TimeUnit.SECONDS.sleep(secondsPerFloor);
                 this.currentFloor -= 1;
+                System.out.println("From current Floor " + this.currentFloor + " at " + secondsPerFloor + " secondsPerFloor");
+
             } else {
                 this.direction = "up";
                 TimeUnit.SECONDS.sleep(secondsPerFloor);
