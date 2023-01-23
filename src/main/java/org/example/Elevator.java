@@ -61,6 +61,7 @@ public class Elevator {
 
     public void callElevator(int destinationFloor, int secondsPerFloor) throws InterruptedException {
         System.out.println("Elevator " + this.elevatorLetter + " moving from current Floor " + this.currentFloor + " at " + secondsPerFloor + " secondsPerFloor");
+        ElevatorStatus status = this.getStatus();
 
         closeDoors();
         this.destinationFloor = destinationFloor;
@@ -72,7 +73,17 @@ public class Elevator {
                 this.direction = "down";
                 TimeUnit.SECONDS.sleep(secondsPerFloor);
                 this.currentFloor -= 1;
-                System.out.println("Elevator " + this.elevatorLetter + " moving from current Floor " + this.currentFloor + " at " + secondsPerFloor + " secondsPerFloor");
+
+                status.setCurrentFloor(this.currentFloor);
+
+                if (this.currentFloor == 0) {
+                    this.state = "idle";
+                    this.direction = "";
+                }
+                status.setDirection(this.direction);
+                status.setState(this.state);
+
+                System.out.println("Elevator " + this.elevatorLetter + " is at floor " + status.getCurrentFloor() + " and is " + status.getState() + " " + status.getDirection());
 
             } else {
                 this.direction = "up";
