@@ -3,13 +3,15 @@ package org.example;
 import java.util.concurrent.TimeUnit;
 
 public class Elevator {
+    private char elevatorLetter;
     private int currentFloor;
     private String state; // "idle" or "moving"
     private String direction; // "up" or "down"
     private String doors; // "open" or "closed"
     private int destinationFloor;
 
-    public Elevator(int currentFloor, int destinationFloor) {
+    public Elevator(char elevatorLetter, int currentFloor, int destinationFloor) {
+        this.elevatorLetter = elevatorLetter;
         this.currentFloor = currentFloor;
         this.state = "idle";
         this.direction = "";
@@ -58,7 +60,7 @@ public class Elevator {
     }
 
     public void callElevator(int destinationFloor, int secondsPerFloor) throws InterruptedException {
-        System.out.println("From current Floor " + this.currentFloor + " at " + secondsPerFloor + " secondsPerFloor");
+        System.out.println("Elevator " + this.elevatorLetter + " moving from current Floor " + this.currentFloor + " at " + secondsPerFloor + " secondsPerFloor");
 
         closeDoors();
         this.destinationFloor = destinationFloor;
@@ -70,7 +72,7 @@ public class Elevator {
                 this.direction = "down";
                 TimeUnit.SECONDS.sleep(secondsPerFloor);
                 this.currentFloor -= 1;
-                System.out.println("From current Floor " + this.currentFloor + " at " + secondsPerFloor + " secondsPerFloor");
+                System.out.println("Elevator " + this.elevatorLetter + " moving from current Floor " + this.currentFloor + " at " + secondsPerFloor + " secondsPerFloor");
 
             } else {
                 this.direction = "up";
