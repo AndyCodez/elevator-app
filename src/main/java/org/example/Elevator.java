@@ -7,7 +7,7 @@ import java.sql.*;
 import java.util.concurrent.TimeUnit;
 
 public class Elevator {
-    private Building building;
+    private final Building building;
     private char elevatorLetter;
     private int currentFloor;
     private String state; // "idle" or "moving"
@@ -15,7 +15,7 @@ public class Elevator {
     private String doors; // "open" or "closed"
     private int destinationFloor;
 
-    private static Logger logger = LoggerFactory.getLogger(Main.class);
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public Elevator(Building building, char elevatorLetter, int currentFloor, int destinationFloor) {
         this.building = building;
@@ -85,46 +85,56 @@ public class Elevator {
 
         for (int i=1; i <= floorDifference; i++) {
             if (this.currentFloor > destinationFloor) {
-                this.direction = "down";
-                TimeUnit.SECONDS.sleep(secondsPerFloor);
-                this.currentFloor -= 1;
-
-                status.setCurrentFloor(this.currentFloor);
-
-                if (this.currentFloor == 0) {
-                    this.state = "idle";
-                    this.direction = "";
-                }
-                status.setDirection(this.direction);
-                status.setState(this.state);
-
-                log = "Elevator " + this.elevatorLetter + " is at floor " + status.getCurrentFloor() + " and is " + status.getState() + " " + status.getDirection();
-                logger.info(log);
-                persistLog(log, "Floor " + destinationFloor);
+                goingDown(destinationFloor, secondsPerFloor, status);
 
             } else {
-                this.direction = "up";
-                TimeUnit.SECONDS.sleep(secondsPerFloor);
-                this.currentFloor += 1;
-
-                status.setCurrentFloor(this.currentFloor);
-
-                if (this.currentFloor == destinationFloor) {
-                    this.state = "idle";
-                    this.direction = "";
-                }
-                status.setDirection(this.direction);
-                status.setState(this.state);
-
-                log = "Elevator " + this.elevatorLetter + " is at floor " + status.getCurrentFloor() + " and is " + status.getState() + " " + status.getDirection();
-                logger.info(log);
-                persistLog(log, "Floor " + destinationFloor);
+                goingUp(destinationFloor, secondsPerFloor, status);
 
             }
         }
 
         openDoors();
         closeDoors();
+    }
+
+    private void goingUp(int destinationFloor, int secondsPerFloor, ElevatorStatus status) throws InterruptedException {
+        String log;
+        this.direction = "up";
+        TimeUnit.SECONDS.sleep(secondsPerFloor);
+        this.currentFloor += 1;
+
+        status.setCurrentFloor(this.currentFloor);
+
+        if (this.currentFloor == destinationFloor) {
+            this.state = "idle";
+            this.direction = "";
+        }
+        status.setDirection(this.direction);
+        status.setState(this.state);
+
+        log = "Elevator " + this.elevatorLetter + " is at floor " + status.getCurrentFloor() + " and is " + status.getState() + " " + status.getDirection();
+        logger.info(log);
+        persistLog(log, "Floor " + destinationFloor);
+    }
+
+    private void goingDown(int destinationFloor, int secondsPerFloor, ElevatorStatus status) throws InterruptedException {
+        String log;
+        this.direction = "down";
+        TimeUnit.SECONDS.sleep(secondsPerFloor);
+        this.currentFloor -= 1;
+
+        status.setCurrentFloor(this.currentFloor);
+
+        if (this.currentFloor == 0) {
+            this.state = "idle";
+            this.direction = "";
+        }
+        status.setDirection(this.direction);
+        status.setState(this.state);
+
+        log = "Elevator " + this.elevatorLetter + " is at floor " + status.getCurrentFloor() + " and is " + status.getState() + " " + status.getDirection();
+        logger.info(log);
+        persistLog(log, "Floor " + destinationFloor);
     }
 
     public ElevatorStatus getStatus() {
