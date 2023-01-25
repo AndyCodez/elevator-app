@@ -1,13 +1,17 @@
 package org.example;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class Main {
-    public static void main(String[] args) {
+    private static Logger logger = LoggerFactory.getLogger(Main.class);
 
+    public static void main(String[] args) {
         createDatabaseSchema();
 
         Building building = new Building(5);
@@ -35,7 +39,7 @@ public class Main {
             connection = DriverManager.getConnection(database_url, username, password);
 
             if (connection != null) {
-                System.out.println("Connection established!");
+                logger.info("Database Connection established!");
 
                 String tableSql = "CREATE TABLE IF NOT EXISTS query_log" +
                         "(log_id SERIAL PRIMARY KEY, log varchar(255), made_from varchar(30), made_at TIMESTAMP)";
@@ -43,7 +47,7 @@ public class Main {
                 PreparedStatement preparedStatement = connection.prepareStatement(tableSql);
                 preparedStatement.executeUpdate();
             } else {
-                System.out.println("Connection Failed!");
+                logger.error("Connection Failed!");
             }
 
             assert connection != null;

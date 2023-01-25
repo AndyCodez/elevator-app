@@ -1,5 +1,8 @@
 package org.example;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.*;
 import java.util.concurrent.TimeUnit;
 
@@ -11,6 +14,8 @@ public class Elevator {
     private String direction; // "up" or "down"
     private String doors; // "open" or "closed"
     private int destinationFloor;
+
+    private static Logger logger = LoggerFactory.getLogger(Main.class);
 
     public Elevator(Building building, char elevatorLetter, int currentFloor, int destinationFloor) {
         this.building = building;
@@ -70,7 +75,7 @@ public class Elevator {
         ElevatorStatus status = this.getStatus();
 
         String log = "Elevator " + this.elevatorLetter + " is at floor " + status.getCurrentFloor() + " and is " + status.getState() + " " + status.getDirection();
-        System.out.println(log);
+        logger.info(log);
         persistLog(log, "Floor " + destinationFloor);
 
         closeDoors();
@@ -94,7 +99,7 @@ public class Elevator {
                 status.setState(this.state);
 
                 log = "Elevator " + this.elevatorLetter + " is at floor " + status.getCurrentFloor() + " and is " + status.getState() + " " + status.getDirection();
-                System.out.println(log);
+                logger.info(log);
                 persistLog(log, "Floor " + destinationFloor);
 
             } else {
@@ -112,7 +117,7 @@ public class Elevator {
                 status.setState(this.state);
 
                 log = "Elevator " + this.elevatorLetter + " is at floor " + status.getCurrentFloor() + " and is " + status.getState() + " " + status.getDirection();
-                System.out.println(log);
+                logger.info(log);
                 persistLog(log, "Floor " + destinationFloor);
 
             }
@@ -173,7 +178,7 @@ public class Elevator {
 
                 statement.executeUpdate();
             } else {
-                System.out.println("Connection Failed!");
+                logger.error("Connection Failed!");
             }
 
             assert connection != null;
