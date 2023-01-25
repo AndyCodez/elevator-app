@@ -163,12 +163,6 @@ public class Elevator {
             connection = DriverManager.getConnection(database_url, username, password);
 
             if (connection != null) {
-//                String tableSql = "CREATE TABLE IF NOT EXISTS query_log" +
-//                        "(log_id SERIAL PRIMARY KEY, log varchar(255), made_from varchar(30), made_at TIMESTAMP)";
-//
-//                PreparedStatement preparedStatement = connection.prepareStatement(tableSql);
-//                preparedStatement.executeUpdate();
-
                 String sql = "INSERT INTO query_log (log, made_from, made_at) VALUES (?,?,?)";
 
                 PreparedStatement statement = connection.prepareStatement(sql);
