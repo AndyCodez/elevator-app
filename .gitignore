@@ -1,2 +1,4 @@
 .idea/*
 target/
+src/main/resources/database.properties
+.attach_pid*
