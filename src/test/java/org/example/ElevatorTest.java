@@ -9,8 +9,11 @@ public class ElevatorTest {
 
     @Test
     void callElevatorToALowerFloor() throws InterruptedException {
-        Elevator elevator = new Elevator(3);
+        Building building = new Building(6);
         int destinationFloor = 0;
+
+        Elevator elevator = new Elevator(building, 'A', 3, destinationFloor);
+
         int secondsPerFloor = 1;
         elevator.callElevator(destinationFloor, secondsPerFloor);
 
@@ -19,8 +22,11 @@ public class ElevatorTest {
 
     @Test
     void callElevatorToAHigherFloor() throws InterruptedException {
-        Elevator elevator = new Elevator(1);
+        Building building = new Building(6);
         int destinationFloor = 3;
+
+        Elevator elevator = new Elevator(building, 'B', 1, destinationFloor);
+
         int secondsPerFloor = 1;
 
         elevator.callElevator(destinationFloor, secondsPerFloor);
