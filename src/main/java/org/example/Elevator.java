@@ -1,5 +1,6 @@
 package org.example;
 
+import java.sql.*;
 import java.util.concurrent.TimeUnit;
 
 public class Elevator {
@@ -65,8 +66,12 @@ public class Elevator {
         if (currentFloor > this.building.getNumberOfFloors() || destinationFloor > this.building.getNumberOfFloors()) {
             throw new RuntimeException("Floor number is invalid.");
         }
-        System.out.println("Elevator " + this.elevatorLetter + " moving from current Floor " + this.currentFloor + " at " + secondsPerFloor + " secondsPerFloor");
+
         ElevatorStatus status = this.getStatus();
+
+        String log = "Elevator " + this.elevatorLetter + " is at floor " + status.getCurrentFloor() + " and is " + status.getState() + " " + status.getDirection();
+        System.out.println(log);
+        persistLog(log, "Floor " + destinationFloor);
 
         closeDoors();
         this.destinationFloor = destinationFloor;
@@ -88,7 +93,9 @@ public class Elevator {
                 status.setDirection(this.direction);
                 status.setState(this.state);
 
-                System.out.println("Elevator " + this.elevatorLetter + " is at floor " + status.getCurrentFloor() + " and is " + status.getState() + " " + status.getDirection());
+                log = "Elevator " + this.elevatorLetter + " is at floor " + status.getCurrentFloor() + " and is " + status.getState() + " " + status.getDirection();
+                System.out.println(log);
+                persistLog(log, "Floor " + destinationFloor);
 
             } else {
                 this.direction = "up";
@@ -104,20 +111,28 @@ public class Elevator {
                 status.setDirection(this.direction);
                 status.setState(this.state);
 
-                System.out.println("Elevator " + this.elevatorLetter + " is at floor " + status.getCurrentFloor() + " and is " + status.getState() + " " + status.getDirection());
+                log = "Elevator " + this.elevatorLetter + " is at floor " + status.getCurrentFloor() + " and is " + status.getState() + " " + status.getDirection();
+                System.out.println(log);
+                persistLog(log, "Floor " + destinationFloor);
+
             }
         }
 
         openDoors();
+        closeDoors();
     }
 
     public ElevatorStatus getStatus() {
-        ElevatorStatus elevatorStatus = new ElevatorStatus(this.currentFloor, this.state, this.direction);
-        return elevatorStatus;
+        return new ElevatorStatus(this.currentFloor, this.state, this.direction);
     }
 
     public void openDoors() throws InterruptedException {
         if (this.doors.equals("closed")) {
+            String log = "Elevator " + this.elevatorLetter + " door opening...";
+            ElevatorStatus status = this.getStatus();
+
+            persistLog(log, "Floor " + status.getCurrentFloor());
+
             TimeUnit.SECONDS.sleep(2);
             this.doors = "open";
         }
@@ -125,8 +140,52 @@ public class Elevator {
 
     public void closeDoors() throws InterruptedException {
         if (this.doors.equals("open")) {
+            String log = "Elevator " + this.elevatorLetter + " door closing...";
+            ElevatorStatus status = this.getStatus();
+
+            persistLog(log, "Floor " + status.getCurrentFloor());
+
             TimeUnit.SECONDS.sleep(2);
             this.doors = "closed";
+        }
+    }
+
+    public void persistLog(String log, String madeFrom) {
+        String username = Config.loadDBCredentials().get("username");
+        String password = Config.loadDBCredentials().get("password");
+        String database_url = Config.loadDBCredentials().get("database_url");
+        String database_driver = Config.loadDBCredentials().get("database_driver");
+
+        Connection connection;
+
+        try {
+            Class.forName(database_driver);
+            connection = DriverManager.getConnection(database_url, username, password);
+
+            if (connection != null) {
+//                String tableSql = "CREATE TABLE IF NOT EXISTS query_log" +
+//                        "(log_id SERIAL PRIMARY KEY, log varchar(255), made_from varchar(30), made_at TIMESTAMP)";
+//
+//                PreparedStatement preparedStatement = connection.prepareStatement(tableSql);
+//                preparedStatement.executeUpdate();
+
+                String sql = "INSERT INTO query_log (log, made_from, made_at) VALUES (?,?,?)";
+
+                PreparedStatement statement = connection.prepareStatement(sql);
+
+                statement.setString(1, log);
+                statement.setString(2, madeFrom);
+                statement.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+
+                statement.executeUpdate();
+            } else {
+                System.out.println("Connection Failed!");
+            }
+
+            assert connection != null;
+            connection.close();
+        } catch (ClassNotFoundException | SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }
