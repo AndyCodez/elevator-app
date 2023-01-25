@@ -2,3 +2,4 @@
 target/
 src/main/resources/database.properties
 .attach_pid*
+ezra.log
