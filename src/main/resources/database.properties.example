@@ -1,0 +1,4 @@
+username=andrew
+password=password123
+database_url=jdbc:postgresql://localhost:5432/ezra
+database_driver=org.postgresql.Driver
