@@ -15,15 +15,16 @@ public class Elevator {
     private String doors; // "open" or "closed"
     private int destinationFloor;
 
-    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+    private static final Logger logger = LoggerFactory.getLogger(Elevator.class);
 
+    private static final String CLOSED = "closed";
     public Elevator(Building building, char elevatorLetter, int currentFloor, int destinationFloor) {
         this.building = building;
         this.elevatorLetter = elevatorLetter;
         this.currentFloor = currentFloor;
         this.state = "idle";
         this.direction = "";
-        this.doors = "closed";
+        this.doors = CLOSED;
         this.destinationFloor = destinationFloor;
     }
 
@@ -69,7 +70,7 @@ public class Elevator {
 
     public void callElevator(int destinationFloor, int secondsPerFloor) throws InterruptedException {
         if (currentFloor > this.building.getNumberOfFloors() || destinationFloor > this.building.getNumberOfFloors()) {
-            throw new RuntimeException("Floor number is invalid.");
+            throw new InvalidFloorNumberException("Floor number is invalid.");
         }
 
         ElevatorStatus status = this.getStatus();
@@ -142,7 +143,7 @@ public class Elevator {
     }
 
     public void openDoors() throws InterruptedException {
-        if (this.doors.equals("closed")) {
+        if (this.doors.equals(CLOSED)) {
             String log = "Elevator " + this.elevatorLetter + " door opening...";
             ElevatorStatus status = this.getStatus();
 
@@ -161,7 +162,7 @@ public class Elevator {
             persistLog(log, "Floor " + status.getCurrentFloor());
 
             TimeUnit.SECONDS.sleep(2);
-            this.doors = "closed";
+            this.doors = CLOSED;
         }
     }
 
@@ -187,6 +188,7 @@ public class Elevator {
                 statement.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
 
                 statement.executeUpdate();
+                statement.close();
             } else {
                 logger.error("Connection Failed!");
             }
@@ -194,7 +196,7 @@ public class Elevator {
             assert connection != null;
             connection.close();
         } catch (ClassNotFoundException | SQLException e) {
-            throw new RuntimeException(e);
+            logger.warn(e.getMessage());
         }
     }
 }
